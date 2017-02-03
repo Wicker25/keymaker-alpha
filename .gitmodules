@@ -1,12 +1,12 @@
 [submodule "lib/termcolor"]
 	path = lib/termcolor
-	url = git@github.com:Wicker25/termcolor.git
+	url = https://github.com/Wicker25/termcolor.git
 [submodule "lib/sol2"]
 	path = lib/sol2
-	url = git@github.com:Wicker25/sol2.git
+	url = https://github.com/Wicker25/sol2.git
 [submodule "lib/linenoise"]
 	path = lib/linenoise
-	url = git@github.com:Wicker25/linenoise.git
+	url = https://github.com/Wicker25/linenoise.git
 [submodule "lib/spdlog"]
 	path = lib/spdlog
-	url = git@github.com:Wicker25/spdlog.git
+	url = https://github.com/Wicker25/spdlog.git
