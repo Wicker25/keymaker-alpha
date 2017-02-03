@@ -1,0 +1,20 @@
+/*!
+ * Title ---- km/version.hpp
+ * Author --- Giacomo Trudu aka `Wicker25` - wicker25[at]gmail[dot]com
+ *
+ * Copyright (C) 2017 by Giacomo Trudu.
+ * All rights reserved.
+ *
+ * This file is part of KeyMaker software.
+ */
+
+#ifndef __KM_VERSION_HPP__
+#define __KM_VERSION_HPP__
+
+// Version of KeyMaker
+#define KM_VERSION          "@KM_VERSION@"
+#define KM_VERSION_MAJOR    @KM_VERSION_MAJOR@
+#define KM_VERSION_MINOR    @KM_VERSION_MINOR@
+#define KM_VERSION_PATCH    @KM_VERSION_PATCH@
+
+#endif /* __KM_VERSION_HPP__ */

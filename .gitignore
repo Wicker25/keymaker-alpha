@@ -1,0 +1,49 @@
+# CLion
+cmake-build-debug/
+cmake-build-release/
+.idea/
+
+# CMake files
+CMakeFiles/
+CMakeScripts/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+
+# Project files
+*.cbp
+
+# Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.elf
+
+# Dynamic libraries
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Sources
+/include/km/version.hpp
+
+# Built
+/bin
+
+# Tests
+/tests/fixtures/.km/keyrings/*
+!/tests/fixtures/.km/keyrings/.gitkeep
+/tests/fixtures/.km/logs/*
+!/tests/fixtures/.km/logs/.gitkeep

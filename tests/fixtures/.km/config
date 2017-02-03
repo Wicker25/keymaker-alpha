@@ -1,0 +1,9 @@
+; KeyMaker
+
+[owner]
+name    = John Doe
+company = Acme Inc.
+email   = john-do@email.dev
+
+[security]
+private_key = ./mykey
