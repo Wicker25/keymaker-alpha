@@ -43,6 +43,8 @@ find_package(OpenSSL    REQUIRED)
 find_package(Lua 5.3    REQUIRED)
 find_package(GTest      REQUIRED)
 
+set(LUA_LIBRARIES "${LUA_LIBRARIES};dl")
+
 message(STATUS "Build Linenoise")
 
 execute_process(
