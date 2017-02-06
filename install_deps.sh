@@ -1,7 +1,11 @@
 #!/bin/sh
 
-set -e
 ROOT_PATH="${PWD}"
+
+BOOST_VERSION="1.63.0"
+LUA_VERSION="5.3.4"
+
+set -e
 
 # Retrieve some dependencies by using git
 git submodule update --init --recursive
@@ -9,11 +13,16 @@ git submodule update --init --recursive
 # Build Boost
 if [ ! -d "lib/boost" ]
 then
-  cd lib/
-  wget -O boost_1_63_0.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.bz2
-  tar -xjf boost_1_63_0.tar.bz2
-  rm boost_1_63_0.tar.bz2
-  mv boost_1_63_0 boost
+  cd lib
+
+  wget \
+    -O "boost_${BOOST_VERSION//./_}.tar.bz2" \
+    "https://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_${BOOST_VERSION//./_}.tar.bz2"
+
+  tar -xjf "boost_${BOOST_VERSION//./_}.tar.bz2"
+  rm "boost_${BOOST_VERSION//./_}.tar.bz2"
+  mv "boost_${BOOST_VERSION//./_}" boost
+
   cd boost
   mkdir install/
   ./bootstrap.sh --prefix="${PWD}/install"
@@ -57,11 +66,16 @@ fi
 # Build Lua
 if [ ! -d "lib/lua" ]
 then
-  cd lib/
-  wget -O lua-5.3.4.tar.gz http://www.lua.org/ftp/lua-5.3.4.tar.gz
-  tar -xzf lua-5.3.4.tar.gz
-  rm lua-5.3.4.tar.gz
-  mv lua-5.3.4 lua
+  cd lib
+
+  wget \
+    -O "lua-${LUA_VERSION}.tar.gz" \
+    "http://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
+
+  tar -xzf "lua-${LUA_VERSION}.tar.gz"
+  rm "lua-${LUA_VERSION}.tar.gz"
+  mv "lua-${LUA_VERSION}" lua
+
   cd lua
   make linux
   make local
