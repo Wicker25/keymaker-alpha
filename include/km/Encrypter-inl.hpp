@@ -17,15 +17,18 @@ template <class T>
 Buffer
 Encrypter::getFingerprint(const T &key)
 {
-    auto rsa = key.mRsa;
+    const BIGNUM *n;
+    const BIGNUM *e;
 
-    size_t nLenght = (size_t) BN_num_bytes(rsa->n),
-           eLenght = (size_t) BN_num_bytes(rsa->e);
+    RSA_get0_key(key.mRsa.get(), &n, &e, NULL);
+
+    size_t nLenght = (size_t) BN_num_bytes(n),
+           eLenght = (size_t) BN_num_bytes(e);
 
     Buffer buffer(nLenght + eLenght);
 
-    BN_bn2bin(rsa->n, buffer.data());
-    BN_bn2bin(rsa->e, buffer.data() + nLenght);
+    BN_bn2bin(n, buffer.data());
+    BN_bn2bin(e, buffer.data() + nLenght);
 
     Buffer fingerprint(KEY_FINGERPRINT_LENGTH);
 
