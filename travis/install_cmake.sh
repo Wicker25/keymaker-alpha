@@ -13,6 +13,7 @@ if [ ! -d "tools/cmake-${CMAKE_VERSION}" ]
 then
   wget "https://cmake.org/files/v${CMAKE_VERSION%.*}/cmake-${CMAKE_VERSION}.tar.gz"
   tar xf "cmake-${CMAKE_VERSION}.tar.gz"
+  rm "cmake-${CMAKE_VERSION}.tar.gz"
 
   cd "cmake-${CMAKE_VERSION}"
   ./configure --prefix=/usr
