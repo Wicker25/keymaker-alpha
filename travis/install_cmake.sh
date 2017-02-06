@@ -13,11 +13,14 @@ if [ ! -d "tools/cmake-${CMAKE_VERSION}" ]
 then
   wget "https://cmake.org/files/v${CMAKE_VERSION%.*}/cmake-${CMAKE_VERSION}.tar.gz"
   tar xf "cmake-${CMAKE_VERSION}.tar.gz"
-fi
 
-cd "cmake-${CMAKE_VERSION}"
-./configure --prefix=/usr
-make
-sudo make install
+  cd "cmake-${CMAKE_VERSION}"
+  ./configure --prefix=/usr
+  make
+  sudo make install
+else
+  cd "cmake-${CMAKE_VERSION}"
+  sudo make install
+fi
 
 cd "${TRAVIS_BUILD_DIR}"
