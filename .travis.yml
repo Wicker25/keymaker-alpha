@@ -32,3 +32,4 @@ install:
 
 script:
   - ./build.sh
+  - ./bin/km_tests --gtest_filter=-CoreTest.*
