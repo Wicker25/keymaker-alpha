@@ -28,7 +28,7 @@ install:
   # Install CMake
   - ./travis/install_cmake.sh &> /dev/null
   # Install the dependencies
-  - travis_wait 30 "sh ${TRAVIS_BUILD_DIR}/install_deps.sh &> /dev/null"
+  - travis_wait 30 "./install_deps.sh &> /dev/null"
 
 script:
   - ./build.sh
