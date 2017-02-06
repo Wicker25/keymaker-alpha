@@ -28,20 +28,20 @@ add_definitions(
     -std=c++17
 )
 
-find_package(PkgConfig)
-
-pkg_check_modules(LIBGIT REQUIRED libgit2)
-
 set(Boost_USE_STATIC_LIBS    OFF)
 set(Boost_USE_MULTITHREADED  ON )
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost 1.60  REQUIRED COMPONENTS system filesystem regex program_options)
-find_package(OpenSSL     REQUIRED)
-find_package(Lua 5.3     REQUIRED)
-find_package(GTest       REQUIRED)
+find_package(Threads)
+find_package(PkgConfig)
 
-pkg_search_module(LibSSH2 REQUIRED libssh2)
+pkg_check_modules(LIBSSH2 REQUIRED libssh2)
+pkg_check_modules(LIBGIT  REQUIRED libgit2)
+
+find_package(Boost 1.60 REQUIRED COMPONENTS system filesystem regex program_options)
+find_package(OpenSSL    REQUIRED)
+find_package(Lua 5.3    REQUIRED)
+find_package(GTest      REQUIRED)
 
 message(STATUS "Build Linenoise")
 
@@ -53,24 +53,23 @@ execute_process(
 
 include_directories(
     ${KM_INCLUDE_DIR}
+    ${Boost_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIRS}
+    ${LIBSSH2_INCLUDE_DIRS}
+    ${LIBGIT_INCLUDE_DIRS}
+    ${LUA_INCLUDE_DIR}
+    ${GTEST_INCLUDE_DIRS}
     ${KM_LIB_DIR}/termcolor/include
     ${KM_LIB_DIR}/linenoise
     ${KM_LIB_DIR}/sol2/single
     ${KM_LIB_DIR}/spdlog/include
-    ${Boost_INCLUDE_DIRS}
-    ${OPENSSL_INCLUDE_DIRS}
-    ${LibSSH2_INCLUDE_DIRS}
-    ${LIBGIT_INCLUDE_DIRS}
-    ${LUA_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
 )
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
     ${OPENSSL_LIBRARY_DIRS}
-    ${LibSSH2_LIBRARY_DIRS}
+    ${LIBSSH2_LIBRARY_DIRS}
     ${LIBGIT_LIBRARY_DIRS}
-    ${LUA_LIBRARY_DIRS}
 )
 
 configure_file(
@@ -108,9 +107,10 @@ target_link_libraries(keymaker
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
     ${OPENSSL_LIBRARIES}
-    ${LibSSH2_LIBRARIES}
+    ${LIBSSH2_LIBRARIES}
     ${LIBGIT_LIBRARIES}
     ${LUA_LIBRARIES}
+    ${GTEST_LIBRARIES}
 )
 
 target_link_libraries(keymaker

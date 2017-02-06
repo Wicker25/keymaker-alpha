@@ -1,3 +1,12 @@
+[submodule "lib/openssl"]
+	path = lib/openssl
+	url = https://github.com/Wicker25/openssl.git
+[submodule "lib/libssh2"]
+	path = lib/libssh2
+	url = https://github.com/Wicker25/libssh2.git
+[submodule "lib/libgit2"]
+	path = lib/libgit2
+	url = https://github.com/Wicker25/libgit2.git
 [submodule "lib/termcolor"]
 	path = lib/termcolor
 	url = https://github.com/Wicker25/termcolor.git
@@ -10,3 +19,6 @@
 [submodule "lib/spdlog"]
 	path = lib/spdlog
 	url = https://github.com/Wicker25/spdlog.git
+[submodule "lib/googletest"]
+	path = lib/googletest
+	url = https://github.com/Wicker25/googletest.git
