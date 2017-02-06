@@ -14,6 +14,7 @@ cache:
   apt: true
   directories:
     - lib
+    - tools
 
 language:
   - cpp
@@ -24,15 +25,8 @@ compiler:
 install:
   # Set the C++ compiler
   - sudo ln -sf /usr/bin/g++-6 /usr/bin/g++
-  # Install CMake 3.7.2
-  - sudo apt-get install build-essential
-  - wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
-  - tar xf cmake-3.7.2.tar.gz
-  - cd cmake-3.7.2
-  - ./configure --prefix=/usr
-  - make
-  - sudo make install
-  - cd "${TRAVIS_BUILD_DIR}"
+  # Install CMake
+  - ./travis/install_cmake.sh &> /dev/null
   # Install the dependencies
   - travis_wait 30 "sh ${TRAVIS_BUILD_DIR}/install_deps.sh &> /dev/null"
 

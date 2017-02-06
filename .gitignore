@@ -41,6 +41,7 @@ CPackSourceConfig.cmake
 
 # Built
 /bin
+/tools
 
 # Tests
 /tests/fixtures/.km/keyrings/*

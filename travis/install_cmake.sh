@@ -1,0 +1,23 @@
+#!/bin/sh
+
+CMAKE_VERSION="3.7.2"
+
+set -e
+
+sudo apt-get install build-essential
+sudo apt-get remove cmake
+
+cd tools
+
+if [ ! -d "tools/cmake-${CMAKE_VERSION}" ]
+then
+  wget "https://cmake.org/files/v${CMAKE_VERSION%.*}/cmake-${CMAKE_VERSION}.tar.gz"
+  tar xf "cmake-${CMAKE_VERSION}.tar.gz"
+fi
+
+cd "cmake-${CMAKE_VERSION}"
+./configure --prefix=/usr
+make
+sudo make install
+
+cd "${TRAVIS_BUILD_DIR}"
