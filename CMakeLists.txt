@@ -26,9 +26,10 @@ add_definitions(
     -Wno-deprecated-declarations
     -O2
     -std=c++17
+    -static
 )
 
-set(Boost_USE_STATIC_LIBS    OFF)
+set(Boost_USE_STATIC_LIBS    ON )
 set(Boost_USE_MULTITHREADED  ON )
 set(Boost_USE_STATIC_RUNTIME OFF)
 
@@ -57,8 +58,8 @@ include_directories(
     ${KM_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIRS}
-    ${LIBSSH2_INCLUDE_DIRS}
-    ${LIBGIT_INCLUDE_DIRS}
+    ${LIBSSH2_STATIC_INCLUDE_DIRS}
+    ${LIBGIT_STATIC_INCLUDE_DIRS}
     ${LUA_INCLUDE_DIR}
     ${GTEST_INCLUDE_DIRS}
     ${KM_LIB_DIR}/termcolor/include
@@ -70,8 +71,8 @@ include_directories(
 link_directories(
     ${Boost_LIBRARY_DIRS}
     ${OPENSSL_LIBRARY_DIRS}
-    ${LIBSSH2_LIBRARY_DIRS}
-    ${LIBGIT_LIBRARY_DIRS}
+    ${LIBSSH2_STATIC_LIBRARY_DIRS}
+    ${LIBGIT_STATIC_LIBRARY_DIRS}
 )
 
 configure_file(
@@ -109,10 +110,9 @@ target_link_libraries(keymaker
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
     ${OPENSSL_LIBRARIES}
-    ${LIBSSH2_LIBRARIES}
-    ${LIBGIT_LIBRARIES}
+    ${LIBSSH2_STATIC_LIBRARIES}
+    ${LIBGIT_STATIC_LIBRARIES}
     ${LUA_LIBRARIES}
-    ${GTEST_LIBRARIES}
 )
 
 target_link_libraries(keymaker

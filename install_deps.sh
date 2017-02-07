@@ -2,6 +2,13 @@
 
 ROOT_PATH="${PWD}"
 
+BOOST_PATH="${ROOT_PATH}/lib/boost"
+OPENSSL_PATH="${ROOT_PATH}/lib/openssl"
+LIBSSH2_PATH="${ROOT_PATH}/lib/libssh2"
+LIBGIT2_PATH="${ROOT_PATH}/lib/libgit2"
+LUA_PATH="${ROOT_PATH}/lib/lua"
+GTEST_PATH="${ROOT_PATH}/lib/googletest"
+
 BOOST_VERSION="1.63.0"
 LUA_VERSION="5.3.4"
 
@@ -35,7 +42,7 @@ if [ ! -f "lib/openssl/Makefile" ]
 then
   cd lib/openssl
   mkdir install/
-  ./config --prefix="${PWD}/install"
+  ./Configure --prefix="${PWD}/install" -static linux-x86_64
   make
   make install
   cd "${ROOT_PATH}"
@@ -46,7 +53,11 @@ if [ ! -f "lib/libssh2/Makefile" ]
 then
   cd lib/libssh2
   mkdir install/
-  cmake -DCMAKE_INSTALL_PREFIX="${PWD}/install" -DOPENSSL_ROOT_DIR="${ROOT_PATH}/lib/openssl/install" .
+  cmake \
+    -DCMAKE_INSTALL_PREFIX="${PWD}/install" \
+    -DOPENSSL_ROOT_DIR="${OPENSSL_PATH}/install" \
+    -DOPENSSL_USE_STATIC_LIBS="ON" \
+    .
   make
   make install
   cd "${ROOT_PATH}"
@@ -56,8 +67,14 @@ fi
 if [ ! -f "lib/libgit2/Makefile" ]
 then
   cd lib/libgit2
-  mkdir install/
-  cmake -DCMAKE_INSTALL_PREFIX="${PWD}/install" .
+  PKG_CONFIG_PATH="${LIBSSH2_PATH}/install/lib/pkgconfig:${LIBSSH2_PATH}/install/lib64/pkgconfig" \
+  cmake \
+    -DCMAKE_INSTALL_PREFIX="${PWD}/install" \
+    -DOPENSSL_ROOT_DIR="${OPENSSL_PATH}/install" \
+    -DOPENSSL_USE_STATIC_LIBS="ON" \
+    -DBUILD_SHARED_LIBS="OFF" \
+    -DCURL="OFF" \
+    .
   make
   make install
   cd "${ROOT_PATH}"
