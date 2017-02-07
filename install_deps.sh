@@ -67,7 +67,10 @@ fi
 if [ ! -f "lib/libgit2/Makefile" ]
 then
   cd lib/libgit2
-  PKG_CONFIG_PATH="${LIBSSH2_PATH}/install/lib/pkgconfig:${LIBSSH2_PATH}/install/lib64/pkgconfig" \
+
+  export PKG_CONFIG_PATH="${OPENSSL_PATH}/install/lib/pkgconfig"
+  export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:${LIBSSH2_PATH}/install/lib/pkgconfig:${LIBSSH2_PATH}/install/lib64/pkgconfig"
+
   cmake \
     -DCMAKE_INSTALL_PREFIX="${PWD}/install" \
     -DOPENSSL_ROOT_DIR="${OPENSSL_PATH}/install" \
