@@ -186,7 +186,7 @@ TEST(BufferTest, fromRandom)
     ASSERT_EQ(25, buffer.size());
 }
 
-TEST(BufferTest, destructor)
+TEST(BufferTest, DISABLED_destructor)
 {
     Buffer::value_type *ptr;
 
