@@ -16,14 +16,14 @@ TEST(BufferTest, constructor_empty)
 {
     Buffer buffer;
 
-    ASSERT_EQ(0, buffer.size());
+    ASSERT_EQ(0u, buffer.size());
 }
 
 TEST(BufferTest, constructor_size)
 {
     Buffer buffer(10);
 
-    ASSERT_EQ(10, buffer.size());
+    ASSERT_EQ(10u, buffer.size());
 }
 
 TEST(BufferTest, constructor_range)
@@ -32,7 +32,7 @@ TEST(BufferTest, constructor_range)
 
     Buffer buffer(data.cbegin(), data.cend());
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -40,7 +40,7 @@ TEST(BufferTest, constructor_list)
 {
     Buffer buffer({ 'a', 'b', 'c', 'd', 'e' });
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -50,7 +50,7 @@ TEST(BufferTest, fromArray)
 
     auto buffer = Buffer::fromArray(list, 5);
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -70,7 +70,7 @@ TEST(BufferTest, fromString)
 {
     auto buffer = Buffer::fromString("abcde");
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -79,7 +79,7 @@ TEST(BufferTest, toString)
     auto buffer = Buffer::fromString("abcde");
     auto result = buffer.toString();
 
-    ASSERT_EQ(5, result.length());
+    ASSERT_EQ(5u, result.length());
     ASSERT_EQ("abcde", result);
 }
 
@@ -87,7 +87,7 @@ TEST(BufferTest, fromHex_String)
 {
     auto buffer = Buffer::fromHex<std::string>("6162636465");
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -96,7 +96,7 @@ TEST(BufferTest, toHex_String)
     auto buffer = Buffer::fromString("abcde");
     auto result = buffer.toHex<std::string>();
 
-    ASSERT_EQ(10, result.length());
+    ASSERT_EQ(10u, result.length());
     ASSERT_EQ("6162636465", result);
 }
 
@@ -106,7 +106,7 @@ TEST(BufferTest, fromHex_Buffer)
         Buffer::fromString("6162636465")
     );
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -115,7 +115,7 @@ TEST(BufferTest, toHex_Buffer)
     auto buffer = Buffer::fromString("abcde");
     auto result = buffer.toHex<Buffer>();
 
-    ASSERT_EQ(10, result.size());
+    ASSERT_EQ(10u, result.size());
     ASSERT_EQ(Buffer::fromString("6162636465"), result);
 }
 
@@ -123,7 +123,7 @@ TEST(BufferTest, fromBase64_String)
 {
     auto buffer = Buffer::fromBase64<std::string>("YWJjZGU=");
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -132,19 +132,19 @@ TEST(BufferTest, toBase64_String)
     auto buffer0 = Buffer::fromString("abc");
     auto result0 = buffer0.toBase64<std::string>();
 
-    ASSERT_EQ(4, result0.size());
+    ASSERT_EQ(4u, result0.size());
     ASSERT_EQ("YWJj", result0);
 
     auto buffer1 = Buffer::fromString("abcd");
     auto result1 = buffer1.toBase64<std::string>();
 
-    ASSERT_EQ(8, result1.size());
+    ASSERT_EQ(8u, result1.size());
     ASSERT_EQ("YWJjZA==", result1);
 
     auto buffer2 = Buffer::fromString("abcde");
     auto result2 = buffer2.toBase64<std::string>();
 
-    ASSERT_EQ(8, result2.size());
+    ASSERT_EQ(8u, result2.size());
     ASSERT_EQ("YWJjZGU=", result2);
 }
 
@@ -154,7 +154,7 @@ TEST(BufferTest, fromBase64_Buffer)
         Buffer::fromString("YWJjZGU=")
     );
 
-    ASSERT_EQ(5, buffer.size());
+    ASSERT_EQ(5u, buffer.size());
     ASSERT_EQ("abcde", buffer.toString());
 }
 
@@ -163,19 +163,19 @@ TEST(BufferTest, toBase64_Buffer)
     auto buffer0 = Buffer::fromString("abc");
     auto result0 = buffer0.toBase64<Buffer>();
 
-    ASSERT_EQ(4, result0.size());
+    ASSERT_EQ(4u, result0.size());
     ASSERT_EQ("YWJj", result0.toString());
 
     auto buffer1 = Buffer::fromString("abcd");
     auto result1 = buffer1.toBase64<Buffer>();
 
-    ASSERT_EQ(8, result1.size());
+    ASSERT_EQ(8u, result1.size());
     ASSERT_EQ("YWJjZA==", result1.toString());
 
     auto buffer2 = Buffer::fromString("abcde");
     auto result2 = buffer2.toBase64<Buffer>();
 
-    ASSERT_EQ(8, result2.size());
+    ASSERT_EQ(8u, result2.size());
     ASSERT_EQ("YWJjZGU=", result2.toString());
 }
 
@@ -183,7 +183,7 @@ TEST(BufferTest, fromRandom)
 {
     auto buffer = Buffer::fromRandom(25);
 
-    ASSERT_EQ(25, buffer.size());
+    ASSERT_EQ(25u, buffer.size());
 }
 
 TEST(BufferTest, DISABLED_destructor)
