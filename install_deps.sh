@@ -57,6 +57,7 @@ then
     -DCMAKE_INSTALL_PREFIX="${PWD}/install" \
     -DOPENSSL_ROOT_DIR="${OPENSSL_PATH}/install" \
     -DOPENSSL_USE_STATIC_LIBS="ON" \
+    -DBUILD_SHARED_LIBS="OFF" \
     .
   make
   make install
@@ -67,6 +68,8 @@ fi
 if [ ! -f "lib/libgit2/Makefile" ]
 then
   cd lib/libgit2
+
+  patch -p1 < "../libgit2.patch"
 
   export PKG_CONFIG_PATH="${OPENSSL_PATH}/install/lib/pkgconfig"
   export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:${LIBSSH2_PATH}/install/lib/pkgconfig:${LIBSSH2_PATH}/install/lib64/pkgconfig"
