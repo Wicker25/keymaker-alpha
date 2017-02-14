@@ -58,7 +58,7 @@ public:
     /*!
      * The remote shell hostname.
      */
-    const Buffer ShellHostname = Buffer::fromString("keymaker.dev");
+    const Buffer ShellHostname = Buffer::fromString("keymaker.io");
 
     /*!
      * The remote shell address.

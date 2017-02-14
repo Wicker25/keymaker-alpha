@@ -30,7 +30,7 @@
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 
-#define GIT_ADDRESS  "keymaker.dev"
+#define GIT_ADDRESS  "keymaker.io"
 #define GIT_USERNAME "km"
 
 using namespace boost;
