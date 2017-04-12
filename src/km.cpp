@@ -10,8 +10,6 @@
 
 #include <km/CommandLine.hpp>
 
-using namespace boost;
-
 int main(int argc, char **argv)
 {
     km::CommandLine commandLine(argc, argv);
