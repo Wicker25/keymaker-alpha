@@ -13,4 +13,7 @@
 
 #include <km/version.hpp>
 
+// Define main namespace
+namespace km { }
+
 #endif /* __KM_HPP__ */
