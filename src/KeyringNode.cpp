@@ -22,9 +22,15 @@ KeyringNode::EntryDir = "entries";
 KeyringNode
 KeyringNode::create()
 {
-    KeyringNode entry;
+    KeyringNode node;
 
-    return entry;
+    return node;
+}
+
+KeyringNode
+KeyringNode::create(const KeyringNode &other)
+{
+    return KeyringNode(other);
 }
 
 KeyringNode
@@ -35,18 +41,28 @@ KeyringNode::fromPath(const filesystem::path &path)
 
     KeyringNode keyring;
 
-    keyring.mId = Buffer::fromString(filename.string());
+    keyring.mId   = Buffer::fromString(filename.string());
     keyring.mPath = path;
 
     property_tree::ptree config;
 
     property_tree::read_xml(configPath.string(), config);
 
+    PropertyContainer<KeyringNode>::fromConfig(
+        keyring,
+        config.get_child("keymaker")
+    );
+
     for (auto &node : config.get_child("keymaker.accessKeys")) {
+
+        if (node.first == "<xmlattr>") {
+            continue;
+        }
 
         auto accessKey = AccessKey::fromConfig(node.second);
         keyring.mAccessKeys[accessKey.getRecipient()] = AccessKey::fromConfig(node.second);
     }
+
 
     // FIXME: move this into a function
     {
@@ -80,6 +96,8 @@ KeyringNode::toPath(const filesystem::path &path, const KeyringNode &keyring)
     property_tree::ptree config;
 
     config.put<std::string>("keymaker.<xmlattr>.version", "1.0");
+
+    config.put_child("keymaker", PropertyContainer<KeyringNode>::toConfig(keyring));
 
     for (auto &it : keyring.mAccessKeys) {
         config.add_child("keymaker.accessKeys.entry", AccessKey::toConfig(it.second));

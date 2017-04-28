@@ -91,8 +91,9 @@ add_library(keymaker STATIC
     ${KM_SOURCE_DIR}/Encrypter.cpp
     ${KM_SOURCE_DIR}/TextNode.cpp
     ${KM_SOURCE_DIR}/PropertyNode.cpp
-    ${KM_SOURCE_DIR}/KeyringNode.cpp
+    ${KM_SOURCE_DIR}/PropertyContainer.cpp
     ${KM_SOURCE_DIR}/EntryNode.cpp
+    ${KM_SOURCE_DIR}/KeyringNode.cpp
     ${KM_SOURCE_DIR}/Repository.cpp
     ${KM_SOURCE_DIR}/Commit.cpp
     ${KM_SOURCE_DIR}/SshClient.cpp

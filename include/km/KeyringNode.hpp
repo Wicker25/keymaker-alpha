@@ -15,6 +15,7 @@
 #include <km/Exception.hpp>
 #include <km/Buffer.hpp>
 #include <km/AccessKey.hpp>
+#include <km/PropertyContainer.hpp>
 #include <km/EntryNode.hpp>
 
 #include <algorithm>
@@ -31,9 +32,14 @@ using namespace boost;
 namespace km { // Begin main namespace
 
 /*!
+ * The access key map.
+ */
+typedef std::map<Buffer, AccessKey> AccessKeyMap;
+
+/*!
  * The keyring.
  */
-class KeyringNode
+class KeyringNode : public PropertyContainer<KeyringNode>
 {
 
 public:
@@ -54,6 +60,13 @@ public:
      * @return The keyring node.
      */
     static KeyringNode create();
+
+    /*!
+     * Copies a keyring node.
+     *
+     * @return The new keyring node.
+     */
+    static KeyringNode create(const KeyringNode &other);
 
     /*!
      * Builds a new keyring from a path.
@@ -89,6 +102,11 @@ public:
      * TODO
      */
 	const AccessKey &getAccessKey(const Buffer &recipient) const;
+
+    // FIXME
+    KeyringNode &setAccessKeys(const AccessKeyMap &accessKeys);
+    const AccessKeyMap &getAccessKeys() const;
+
 
     /*!
      * Sets an entry into the keyring.
@@ -144,9 +162,14 @@ protected:
     filesystem::path mPath;
 
     /*!
+     * The keyring properties.
+     */
+    PropertyMap mProperties;
+
+    /*!
      * The access keys.
      */
-    std::map<Buffer, AccessKey> mAccessKeys;
+    AccessKeyMap mAccessKeys;
 
     /*!
      * The keyring entries.

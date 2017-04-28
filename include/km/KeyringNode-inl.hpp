@@ -14,6 +14,19 @@
 namespace km { // Begin main namespace
 
 inline KeyringNode &
+KeyringNode::setAccessKeys(const AccessKeyMap &accessKeys)
+{
+    mAccessKeys = accessKeys;
+    return *this;
+}
+
+inline const AccessKeyMap &
+KeyringNode::getAccessKeys() const
+{
+    return mAccessKeys;
+}
+
+inline KeyringNode &
 KeyringNode::save(const filesystem::path &path)
 {
     KeyringNode::toPath(path, *this);

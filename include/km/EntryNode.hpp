@@ -14,9 +14,7 @@
 #include <km.hpp>
 #include <km/Exception.hpp>
 #include <km/Buffer.hpp>
-#include <km/PropertyNode.hpp>
-
-#include <map>
+#include <km/PropertyContainer.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -32,14 +30,9 @@ using namespace boost;
 namespace km { // Begin main namespace
 
 /*!
- * The property map.
- */
-typedef std::map<Buffer, PropertyNode> PropertyMap;
-
-/*!
  * The repository entry.
  */
-class EntryNode
+class EntryNode : public PropertyContainer<EntryNode>
 {
 
 public:
@@ -52,13 +45,11 @@ public:
 	static EntryNode create();
 
     /*!
-     * Creates an entry node.
+     * Copies a entry node.
      *
-     * @param[in] id The entry ID.
-     *
-     * @return The entry node.
+     * @return The new entry node.
      */
-    static EntryNode create(const Buffer &id);
+    static EntryNode create(const EntryNode &other);
 
     /*!
      * Reads an entry from a file.
@@ -87,66 +78,6 @@ public:
      */
     const Buffer &getId() const;
 
-    /*!
-     * Sets a property in the entry.
-     *
-     * @param[in] name     The property name.
-     * @param[in] property The property instance.
-     *
-     * @return The entry node.
-     */
-	EntryNode &setProperty(const Buffer &name, const PropertyNode &property);
-
-	/*!
-     * Sets a property in the entry.
-     *
-     * @param[in] name  The property name.
-     * @param[in] value The property value.
-     *
-     * @return The entry node.
-     */
-	EntryNode &setProperty(const Buffer &name, const Buffer &value);
-
-    /*!
-     * Returns a property in the entry.
-     *
-     * @param[in] name The property name.
-     *
-     * @return The property node.
-     */
-	const PropertyNode &getProperty(const Buffer &name) const;
-
-	/*!
-     * Removes a property from the entry.
-     *
-     * @param[in] name The property name.
-     *
-     * @return The entry node.
-     */
-	EntryNode &removeProperty(const Buffer &name);
-
-    /*!
-     * Iterates over the properties in the entry.
-     *
-     * @param[in] callback The callback function.
-     *
-     * @return The entry node.
-     */
-	EntryNode &eachProperty(std::function<void (const Buffer &, PropertyNode &)> callback);
-
-	/*!
-     * Iterates over the properties in the entry.
-     *
-     * @param[in] callback The callback function.
-     *
-     * @return The entry node.
-     */
-
-    // FIXME
-    const EntryNode &eachProperty(std::function<void (const Buffer &, const PropertyNode &)> callback) const;
-
-    EntryNode mapProperty(std::function<PropertyNode (const Buffer &, const PropertyNode &)> callback) const;
-
 private:
 
 	/*!
@@ -159,20 +90,6 @@ private:
      * The entry ID.
      */
     Buffer mId;
-
-    /*!
-     * The entry properties.
-     */
-    PropertyMap mProperties;
-};
-
-
-/*!
- * The property not found exception.
- */
-class PropertyNotFoundException : public Exception
-{
-	using Exception::Exception;
 };
 
 } // End of main namespace

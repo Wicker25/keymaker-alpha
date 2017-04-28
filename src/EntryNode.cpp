@@ -27,13 +27,9 @@ EntryNode::create()
 }
 
 EntryNode
-EntryNode::create(const Buffer &id)
+EntryNode::create(const EntryNode &other)
 {
-    EntryNode entry;
-
-    entry.mId = id;
-
-    return entry;
+    return EntryNode(other);
 }
 
 EntryNode
@@ -46,15 +42,10 @@ EntryNode::fromFile(const filesystem::path &path)
 
     entry.mId = path.filename().string();
 
-    for (auto &node : config.get_child("entry")) {
-
-        if (node.first == "<xmlattr>") {
-            continue;
-        }
-
-        PropertyNode property = PropertyNode::fromConfig(node.second);
-        entry.setProperty(property.getName(), property);
-    }
+    PropertyContainer<EntryNode>::fromConfig(
+        entry,
+        config.get_child("entry")
+    );
 
     return entry;
 }
@@ -66,9 +57,7 @@ EntryNode::toFile(const filesystem::path &path, const EntryNode &entry)
 
     config.put<std::string>("entry.<xmlattr>.version", "1.0");
 
-    entry.eachProperty([&config](const Buffer &key, const PropertyNode &property) {
-        config.add_child("entry.property", PropertyNode::toConfig(property));
-    });
+    config.put_child("entry", PropertyContainer<EntryNode>::toConfig(entry));
 
     property_tree::write_xml(
         path.string(),
@@ -86,49 +75,6 @@ EntryNode::EntryNode()
 EntryNode::~EntryNode()
 {
 
-}
-
-EntryNode &
-EntryNode::setProperty(const Buffer &name, const Buffer &value)
-{
-    auto property = PropertyNode::create(name, value);
-    setProperty(name, property);
-
-    return *this;
-}
-
-EntryNode &
-EntryNode::eachProperty(std::function<void (const Buffer &, PropertyNode &)> callback)
-{
-    for (auto &node : mProperties) {
-        callback(node.first, node.second);
-    }
-
-    return *this;
-}
-
-const EntryNode &
-EntryNode::eachProperty(std::function<void (const Buffer &, const PropertyNode &)> callback) const
-{
-    for (auto &node : mProperties) {
-        callback(node.first, node.second);
-    }
-
-    return *this;
-}
-
-EntryNode
-EntryNode::mapProperty(std::function<PropertyNode (const Buffer &, const PropertyNode &)> callback) const
-{
-    auto output = EntryNode::create(mId);
-
-    for (auto &node : mProperties) {
-
-        auto property = callback(node.first, node.second);
-        output.setProperty(property.getName(), property);
-    }
-
-    return output;
 }
 
 } // End of main namespace
