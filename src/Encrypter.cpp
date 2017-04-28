@@ -137,7 +137,7 @@ Encrypter::encrypt<PropertyNode>(const PropertyNode &input) const
 
     return PropertyNode::create
     (
-        encrypt(name, nonce),
+        encrypt(name,    nonce),
         encrypt(content, nonce),
         nonce
     );
@@ -158,6 +158,50 @@ Encrypter::decrypt<PropertyNode>(const PropertyNode &input) const
         removePadding(content),
         nonce
     );
+}
+
+template <>
+EntryNode
+Encrypter::encrypt<EntryNode>(const EntryNode &input) const
+{
+    auto output = input.mapProperty([this](const Buffer &name, const PropertyNode &property) {
+        return encrypt<PropertyNode>(property);
+    });
+
+    return output;
+}
+
+template <>
+EntryNode
+Encrypter::decrypt<EntryNode>(const EntryNode &input) const
+{
+    auto output = input.mapProperty([this](const Buffer &name, const PropertyNode &property) {
+        return decrypt<PropertyNode>(property);
+    });
+
+    return output;
+}
+
+template <>
+KeyringNode
+Encrypter::encrypt<KeyringNode>(const KeyringNode &input) const
+{
+    auto output = input.mapProperty([this](const Buffer &name, const PropertyNode &property) {
+        return encrypt<PropertyNode>(property);
+    });
+
+    return output;
+}
+
+template <>
+KeyringNode
+Encrypter::decrypt<KeyringNode>(const KeyringNode &input) const
+{
+    auto output = input.mapProperty([this](const Buffer &name, const PropertyNode &property) {
+        return decrypt<PropertyNode>(property);
+    });
+
+    return output;
 }
 
 Buffer

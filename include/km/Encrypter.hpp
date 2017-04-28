@@ -18,8 +18,10 @@
 #include <km/PrivateKey.hpp>
 #include <km/PublicKey.hpp>
 #include <km/AccessKey.hpp>
-#include <km/PropertyNode.hpp>
 #include <km/TextNode.hpp>
+#include <km/PropertyNode.hpp>
+#include <km/EntryNode.hpp>
+#include <km/KeyringNode.hpp>
 
 #include <memory>
 #include <algorithm>
