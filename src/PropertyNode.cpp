@@ -40,9 +40,9 @@ PropertyNode::fromConfig(property_tree::ptree &config)
 {
     PropertyNode node;
 
-    std::string nonce   = config.get<std::string>("nonce");
-    std::string name    = config.get<std::string>("name");
-    std::string content = config.get<std::string>("content");
+    auto nonce   = config.get<std::string>("nonce");
+    auto name    = config.get<std::string>("name");
+    auto content = config.get<std::string>("content");
 
     algorithm::erase_all_regex(nonce,   regex("\\s"));
     algorithm::erase_all_regex(name,    regex("\\s"));

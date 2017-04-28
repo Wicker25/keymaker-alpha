@@ -15,6 +15,8 @@
 #include <km/Exception.hpp>
 #include <km/Buffer.hpp>
 
+#include <map>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -67,7 +69,7 @@ public:
 	/*!
      * Converts a property node into a property tree.
      *
-     * @param[in] property The property.
+     * @param[in] property The property node.
      *
      * @return The configuration node.
      */
