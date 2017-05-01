@@ -152,7 +152,7 @@ Core::createRepository(const Buffer &name)
     );
 
 
-    buildGitRepository(repositoryId);
+    buildGitRepository(repositoryId, name);
     parseRepository();
 
     auto textNode = mEncrypter->encrypt<TextNode>(
@@ -240,12 +240,10 @@ Core::shareRepository(const Buffer &userId)
 Core &
 Core::setRepositoryEntry(const EntryNode &input)
 {
-    auto output = input.mapProperty([this](const Buffer &name, const PropertyNode &property) {
-        return mEncrypter->encrypt<PropertyNode>(property);
-    });
-
     auto &repository = getRepository();
     auto &keyring    = getKeyring();
+
+    auto output = mEncrypter->encrypt<EntryNode>(input);
 
     keyring
         .setEntry(output)
@@ -260,11 +258,9 @@ Core::setRepositoryEntry(const EntryNode &input)
 EntryNode
 Core::getRepositoryEntry(const Buffer &id)
 {
-    auto input = mKeyringNode->getEntry(id);
-
-    return input.mapProperty([this](const Buffer &name, const PropertyNode &property) {
-        return mEncrypter->decrypt<PropertyNode>(property);
-    });
+    return mEncrypter->decrypt<EntryNode>(
+        mKeyringNode->getEntry(id)
+    );
 }
 
 Core &
@@ -412,9 +408,55 @@ Core::eachRepository(std::function<void (const Buffer &id, Repository &)> callba
         auto repositoryId   = Buffer::fromString(name);
         auto repositoryPath = mKeyringPath / repositoryId.toString();
 
+        // FIXME: improve this shit!!!
         auto repository = Repository::fromPath(repositoryId, repositoryPath, mPrivateKey);
 
         callback(repositoryId, repository);
+    }
+
+    return *this;
+}
+
+Core &
+Core::eachKeyring(std::function<void (const Buffer &id, KeyringNode &)> callback)
+{
+    if (!filesystem::is_directory(mKeyringPath)) {
+        throw Exception("Unable to find the directory 'keyrings'");
+    }
+
+    filesystem::directory_iterator it(mKeyringPath), end;
+
+    for ( ; it != end; ++it) {
+
+        auto name = it->path().filename().string();
+
+        if (name[0] == '.') {
+            continue;
+        }
+
+        auto repositoryId   = Buffer::fromString(name);
+        auto repositoryPath = mKeyringPath / repositoryId.toString();
+
+        // FIXME: improve this shit!!!
+        auto repository = Repository::fromPath(repositoryId, repositoryPath, mPrivateKey);
+
+        auto keyringNode = std::make_unique<KeyringNode>(
+            KeyringNode::fromPath(repository.getPath())
+        );
+
+        auto accessKey = keyringNode->getAccessKey(
+            Encrypter::getFingerprint(mPrivateKey)
+        );
+
+        auto encrypter = std::make_unique<Encrypter>(
+            Encrypter::create(accessKey, mPrivateKey)
+        );
+
+        auto aaa = encrypter->decrypt<KeyringNode>(
+            *keyringNode
+        );
+
+        callback(aaa.getId(), aaa);
     }
 
     return *this;
@@ -489,7 +531,7 @@ Core::getRepositories()
 
 
 KeyringNode
-Core::createKeyring(const PublicKey &publicKey) const
+Core::createKeyring(const Buffer &name, const PublicKey &publicKey) const
 {
     auto accessKey = createAccessKey
     (
@@ -497,6 +539,7 @@ Core::createKeyring(const PublicKey &publicKey) const
         publicKey
     );
 
+    // FIXME: check this
     auto keyring = KeyringNode::create();
     keyring.addAccessKey(accessKey);
 
@@ -516,7 +559,7 @@ Core::createAccessKey(const Buffer &key, const PublicKey &publicKey) const
 }
 
 void
-Core::buildGitRepository(const Buffer &repositoryId)
+Core::buildGitRepository(const Buffer &repositoryId, const Buffer &name)
 {
     auto repositoryPath = mKeyringPath / repositoryId.toString();
 
@@ -524,8 +567,25 @@ Core::buildGitRepository(const Buffer &repositoryId)
 
     openGitRepository(repository);
 
-    auto keyring = createKeyring(mPublicKey);
-    keyring.save(repository.getPath());
+    // FIXME FIXME FIXME
+    auto aaa = createKeyring(name, mPublicKey);
+
+    // FIXME
+    aaa.setProperty("name", name);
+
+    auto accessKey = aaa.getAccessKey(
+        Encrypter::getFingerprint(mPrivateKey)
+    );
+
+    mEncrypter = std::make_unique<Encrypter>(
+        Encrypter::create(accessKey, mPrivateKey)
+    );
+
+    auto keyringNode = mEncrypter->encrypt<KeyringNode>(
+        aaa
+    );
+
+    keyringNode.save(repository.getPath());
 
     repository
         .add("keymaker.xml")

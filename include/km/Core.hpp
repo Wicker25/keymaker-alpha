@@ -167,6 +167,10 @@ public:
      */
     Core &eachRepository(std::function<void (const Buffer &id, Repository &repository)> callback);
 
+    // FIXME: add const ??
+    Core &eachKeyring(std::function<void (const Buffer &id, KeyringNode &)> callback);
+
+
     /*!
      * Lists the repositories.
      */
@@ -265,9 +269,10 @@ protected:
     /*!
      * Creates a keyring node by using a public key.
      *
+     * @param[in] name      The name.
      * @param[in] publicKey The public key.
      */
-    KeyringNode createKeyring(const PublicKey &publicKey) const;
+    KeyringNode createKeyring(const Buffer &name, const PublicKey &publicKey) const;
 
     /*!
      * Creates an access key.
@@ -281,8 +286,9 @@ protected:
      * Builds a Git repository.
      *
      * @param[in] repositoryId The repository ID.
+     * @param[in] name         The name.
      */
-    void buildGitRepository(const Buffer &repositoryId);
+    void buildGitRepository(const Buffer &repositoryId, const Buffer &name);
 
     /*!
      * Opens a Git repository.
