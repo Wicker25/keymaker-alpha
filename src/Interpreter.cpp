@@ -278,10 +278,10 @@ Interpreter::listEntries() const
 
         try {
             auto property = entry.getProperty("name");
-            std::cout << "> " << index << ": " << property.getContent() << std::endl;
+            std::cout << "> " << index << ") " << property.getContent() << std::endl;
 
         } catch (PropertyNotFoundException &e) {
-            std::cout << "> " << index << ": " << entryId << std::endl;
+            std::cout << "> " << index << ") " << entryId << std::endl;
         }
 
         index++;
