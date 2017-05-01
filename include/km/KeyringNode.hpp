@@ -93,6 +93,11 @@ public:
 	virtual ~KeyringNode();
 
     /*!
+     * Returns the keyring ID.
+     */
+    const Buffer &getId() const;
+
+    /*!
      * TODO
      */
     KeyringNode &addAccessKey(const AccessKey &accessKey);
@@ -139,6 +144,9 @@ public:
     const KeyringNode &eachEntry(std::function<void (const Buffer &id, const EntryNode &)> callback) const;
 
     // TODO: add mapEntry
+
+    // FIXME
+    std::size_t getNumberOfEntries() const;
 
     // FIXME
     KeyringNode &save(const filesystem::path &path);

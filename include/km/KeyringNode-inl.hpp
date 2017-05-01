@@ -13,6 +13,12 @@
 
 namespace km { // Begin main namespace
 
+inline const Buffer &
+KeyringNode::getId() const
+{
+    return mId;
+}
+
 inline KeyringNode &
 KeyringNode::setAccessKeys(const AccessKeyMap &accessKeys)
 {
@@ -24,6 +30,12 @@ inline const AccessKeyMap &
 KeyringNode::getAccessKeys() const
 {
     return mAccessKeys;
+}
+
+inline std::size_t
+KeyringNode::getNumberOfEntries() const
+{
+    return mEntries.size();
 }
 
 inline KeyringNode &
