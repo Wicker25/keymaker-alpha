@@ -61,6 +61,11 @@ public:
 protected:
 
     /*!
+     * The type for command.
+     */
+    typedef std::string Command;
+
+    /*!
      * The type for command arguments.
      */
     typedef std::vector<std::string> CommandArgs;
@@ -68,12 +73,12 @@ protected:
     /*!
      * The type for parser methods.
      */
-    typedef std::function<void (CommandLine &, const CommandArgs &)> ParserMethod;
+    typedef std::function<void (CommandLine &, const CommandArgs &)> CommandParserMethod;
 
     /*!
      * The list of parser methods.
      */
-    static std::map<const std::string, ParserMethod> mParserMethods;
+    static std::map<const std::string, CommandParserMethod> mCommandParserMethods;
 
 
     /*!
@@ -82,63 +87,79 @@ protected:
     void authenticate();
 
     /*!
+     * Handles the configurations.
+     */
+    void runConfig(const CommandArgs &args);
+
+    /*!
      * Lists the repositories.
      */
-    void listRepositories(const CommandArgs &args);
+    void runList(const CommandArgs &args);
 
     /*!
      * Creates a new repository.
      */
-    void createRepository(const CommandArgs &args);
+    void runCreate(const CommandArgs &args);
 
     /*!
      * Opens a repository.
      */
-    void openRepository(const CommandArgs &args);
+    void runOpen(const CommandArgs &args);
 
     /*!
      * Shares a repository.
      */
-    void shareRepository(const CommandArgs &args);
+    void runShare(const CommandArgs &args);
 
     /*!
      * Commits the changes of a repository.
      */
-    void commitRepository(const CommandArgs &args);
+    void runCommit(const CommandArgs &args);
 
     /*!
      * Pushes the changes of a repository.
      */
-    void pushRepository(const CommandArgs &args);
+    void runPush(const CommandArgs &args);
 
     /*!
      * Fetches the changes of a repository.
      */
-    void fetchRepository(const CommandArgs &args);
+    void runFetch(const CommandArgs &args);
 
     /*!
      * Prints the logs of a repository.
      */
-    void logRepository(const CommandArgs &args);
+    void runLog(const CommandArgs &args);
 
     /*!
      * Destroys a repository.
      */
-    void destroyRepository(const CommandArgs &args);
-
-    /*!
-     * Shows the owner data.
-     */
-    void showOwner(const CommandArgs &args) const;
+    void runDestroy(const CommandArgs &args);
 
     /*!
      * Parses the command.
      *
-     * @param[in] vm The variables map.
+     * @param[in] command The command.
+     * @param[in] args    The command arguments.
      *
      * @return True if success.
      */
-    bool parseCommand(program_options::variables_map &vm);
+    bool parseCommand(const Command &command, const CommandArgs &args);
+
+    /*!
+     * Parses the command arguments.
+     *
+     * @param[in] args               The command arguments.
+     * @param[in] options            The options.
+     * @param[in] positional_options The positional options.
+     *
+     * @return The variables map.
+     */
+    program_options::variables_map parseCommandArguments(
+        const CommandArgs &args,
+        const program_options::options_description &options,
+        const program_options::positional_options_description &positional = {}
+    );
 
     /*!
      * Prints a commit.

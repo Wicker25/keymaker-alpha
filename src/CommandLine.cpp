@@ -12,59 +12,80 @@
 
 namespace km { // Begin main namespace
 
-std::map<const std::string, CommandLine::ParserMethod> CommandLine::mParserMethods =
+std::map<const std::string, CommandLine::CommandParserMethod> CommandLine::mCommandParserMethods =
 {
-    { "list",    &CommandLine::listRepositories  },
-    { "create",  &CommandLine::createRepository  },
-    { "open",    &CommandLine::openRepository    },
-    { "share",   &CommandLine::shareRepository   },
-    { "commit",  &CommandLine::commitRepository  },
-    { "push",    &CommandLine::pushRepository    },
-    { "fetch",   &CommandLine::fetchRepository   },
-    { "log",     &CommandLine::logRepository     },
-    { "destroy", &CommandLine::destroyRepository },
-    { "owner",   &CommandLine::showOwner         }
+    { "config",  &CommandLine::runConfig  },
+    { "list",    &CommandLine::runList    },
+    { "create",  &CommandLine::runCreate  },
+    { "open",    &CommandLine::runOpen    },
+    { "share",   &CommandLine::runShare   },
+    { "commit",  &CommandLine::runCommit  },
+    { "push",    &CommandLine::runPush    },
+    { "fetch",   &CommandLine::runFetch   },
+    { "log",     &CommandLine::runLog     },
+    { "destroy", &CommandLine::runDestroy }
 };
 
 
 CommandLine::CommandLine(int argc, char **argv)
 {
-    // Optional parameters
-    program_options::options_description usage("Usage: km [OPTION...] [COMMAND]");
-    usage.add_options()
-        ("help,h", "show this help message")
-    ;
+    namespace po = boost::program_options;
 
-    // Positional parameters
-    program_options::options_description hidden("Hidden options");
+    // Usage description
+    po::options_description usage("Usage: km [OPTIONS] <COMMAND>");
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
     hidden.add_options()
-        ("command", program_options::value<CommandArgs>(), "command")
+        ("command", po::value<Command>(),     "The command to run"   )
+        ("extra",   po::value<CommandArgs>(), "The command arguments")
     ;
 
-    program_options::positional_options_description positional;
-    positional.add("command", -1);
+    po::positional_options_description positional;
+    positional
+        .add("command", 1)
+        .add("extra",  -1)
+    ;
 
-    // All parameters
-    program_options::options_description all("Allowed options");
-    all
-        .add(usage)
+    // All arguments
+    po::options_description options("Allowed options");
+    options
         .add(hidden)
+        .add(usage)
     ;
 
-    program_options::variables_map vm;
+    po::variables_map vm;
 
-    program_options::store
-    (
-        program_options::command_line_parser(argc, argv)
-            .options(all)
+    Command     command;
+    CommandArgs command_args;
+
+    try {
+
+        po::parsed_options parsed = po::command_line_parser(argc, (const char **) argv)
+            .options(options)
             .positional(positional)
+            .allow_unregistered()
             .run()
-        ,
-        vm
-    );
+        ;
 
-    program_options::notify(vm);
+        po::store(parsed, vm);
+        po::notify(vm);
 
+        if (vm.count("command")) {
+            command = vm["command"].as<Command>();
+        }
+
+        command_args = po::collect_unrecognized(
+            parsed.options,
+            po::include_positional
+        );
+
+        command_args.erase(command_args.begin());
+
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return;
+    }
 
     if (vm.count("help")) {
 
@@ -72,8 +93,7 @@ CommandLine::CommandLine(int argc, char **argv)
         return;
     }
 
-
-    if (!parseCommand(vm)) {
+    if (!parseCommand(command, command_args)) {
         std::cerr << usage;
     }
 }
@@ -115,69 +135,235 @@ CommandLine::authenticate()
 }
 
 void
-CommandLine::listRepositories(const CommandArgs &args)
+CommandLine::runConfig(const CommandArgs &args)
 {
-    std::size_t index = 0;
+    namespace po = boost::program_options;
 
-    mCore.eachRepository([this, &index](const Buffer &id, Repository &repository) {
-        std::cout << index++ << " => " << id << std::endl;
-    });
-}
-
-void
-CommandLine::createRepository(const CommandArgs &args)
-{
-    // TODO: improve this
-    if (args.size() != 2) {
-        throwError("Invalid number of arguments");
-    }
-
-    auto name = Buffer::fromString(args[1]);
-
-    authenticate();
-
-    mCore.createRepository(name);
-}
-
-void
-CommandLine::openRepository(const CommandArgs &args)
-{
-    // TODO: improve this
-    if (args.size() != 2) {
-        throwError("Invalid number of arguments");
-    }
-
-    auto repositoryId = mInterpreter.parseRepository(args[1]);
-
-    authenticate();
-
-    mCore.openRepository(repositoryId);
-
-    mInterpreter.openShell();
-}
-
-void
-CommandLine::shareRepository(const CommandArgs &args)
-{
-    // TODO: improve this
-    if (args.size() != 3) {
-        throwError("Invalid number of arguments");
-    }
-
-    auto repositoryId = mInterpreter.parseRepository(args[1]);
-    auto userId       = Buffer::fromString(args[2]);
-
-    authenticate();
-
-    mCore
-        .openRepository(repositoryId)
-        .shareRepository(userId)
+    // Usage description
+    po::options_description usage("Usage: km config [OPTIONS]");
+    usage.add_options()
+        ("init,i", "Initializes the configurations")
+        ("list,l", "Lists the configurations"      )
+        ("help,h", "Show this help message"        )
     ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options);
+
+    if (vm.count("init")) {
+
+        // TODO
+        std::cout << "Initialize\n";
+
+    } else if (vm.count("list")) {
+
+        // List the configurations
+        for (auto &config : OwnerConfigs) {
+            printParameter(config.second, mCore.getEnvironment<Buffer>(config.first));
+        }
+
+    } else if (vm.count("help")) {
+        std::cerr << usage;
+    }
 }
 
 void
-CommandLine::commitRepository(const CommandArgs &args)
+CommandLine::runList(const CommandArgs &args)
 {
+    namespace po = boost::program_options;
+
+    // Usage description
+    po::options_description usage("Usage: km list [OPTIONS]");
+    usage.add_options()
+        ("help,h", "Show this help message")
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options);
+
+    if (vm.count("help")) {
+        std::cout << usage;
+
+    } else {
+
+        authenticate();
+
+        std::size_t index = 0;
+
+        mCore.eachKeyring([this, &index](const Buffer &id, KeyringNode &keyringNode) {
+
+            auto nameProperty = keyringNode.getProperty("name");
+
+            std::cout
+                << "> " << index++ << ") "
+                << nameProperty.getContent()
+                << " [" << keyringNode.getNumberOfEntries() << " entries]"
+                << std::endl;
+        });
+    }
+}
+
+void
+CommandLine::runCreate(const CommandArgs &args)
+{
+    namespace po = boost::program_options;
+
+    // Usage description
+    po::options_description usage("Usage: km create [OPTIONS] <NAME>");
+    usage.add_options()
+        ("help,h", "Show this help message")
+    ;
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("name", po::value<std::string>(), "The name of the new repository")
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("name", 1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cerr << usage;
+
+    } else if (vm.count("name")) {
+
+        auto name = Buffer::fromString(vm["name"].as<std::string>());
+
+        authenticate();
+
+        mCore.createRepository(name);
+    }
+}
+
+void
+CommandLine::runOpen(const CommandArgs &args)
+{
+    namespace po = boost::program_options;
+
+    // Usage description
+    po::options_description usage("Usage: km open [OPTIONS] <REPOSITORY>");
+    usage.add_options()
+        ("help,h", "Show this help message")
+    ;
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("repository_id", po::value<std::string>(), "The repository ID")
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("repository_id", 1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cout << usage;
+
+    } else if (vm.count("repository_id")) {
+
+        auto repositoryId = mInterpreter.parseRepository(
+            vm["repository_id"].as<std::string>()
+        );
+
+        authenticate();
+
+        mCore.openRepository(repositoryId);
+
+        mInterpreter.openShell();
+    }
+}
+
+void
+CommandLine::runShare(const CommandArgs &args)
+{
+    namespace po = boost::program_options;
+
+    // Usage description
+    po::options_description usage("Usage: km share [OPTIONS] <REPOSITORY> <USER>");
+    usage.add_options()
+        ("help,h", "Show this help message")
+    ;
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("repository_id", po::value<std::string>(), "The repository ID")
+        ("user_id",       po::value<std::string>(), "The user ID"      )
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("repository_id", 1)
+        .add("user_id",       1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cerr << usage;
+
+    } else if (vm.count("repository_id") && vm.count("user_id")) {
+
+        auto repositoryId = mInterpreter.parseRepository(vm["repository_id"].as<std::string>());
+        auto userId = Buffer::fromString(vm["user_id"].as<std::string>());
+
+        authenticate();
+
+        mCore
+            .openRepository(repositoryId)
+            .shareRepository(userId)
+        ;
+    }
+}
+
+void
+CommandLine::runCommit(const CommandArgs &args)
+{
+    /*
     // TODO: improve this
     if (args.size() != 3) {
         throwError("Invalid number of arguments");
@@ -192,11 +378,13 @@ CommandLine::commitRepository(const CommandArgs &args)
         .openRepository(repositoryId)
         .commitRepository(message)
     ;
+    */
 }
 
 void
-CommandLine::pushRepository(const CommandArgs &args)
+CommandLine::runPush(const CommandArgs &args)
 {
+    /*
     // TODO: improve this
     if (args.size() != 2) {
         throwError("Invalid number of arguments");
@@ -210,11 +398,13 @@ CommandLine::pushRepository(const CommandArgs &args)
         .openRepository(repositoryId)
         .pushRepository()
     ;
+    */
 }
 
 void
-CommandLine::fetchRepository(const CommandArgs &args)
+CommandLine::runFetch(const CommandArgs &args)
 {
+    /*
     // TODO: improve this
     if (args.size() != 2) {
         throwError("Invalid number of arguments");
@@ -228,11 +418,13 @@ CommandLine::fetchRepository(const CommandArgs &args)
         .openRepository(repositoryId)
         .fetchRepository()
     ;
+    */
 }
 
 void
-CommandLine::logRepository(const CommandArgs &args)
+CommandLine::runLog(const CommandArgs &args)
 {
+    /*
     // TODO: improve this
     if (args.size() != 3) {
         throwError("Invalid number of arguments");
@@ -249,11 +441,13 @@ CommandLine::logRepository(const CommandArgs &args)
             printCommit(commit);
         })
     ;
+    */
 }
 
 void
-CommandLine::destroyRepository(const CommandArgs &args)
+CommandLine::runDestroy(const CommandArgs &args)
 {
+    /*
     // TODO: improve this
     if (args.size() != 2) {
         throwError("Invalid number of arguments");
@@ -267,40 +461,57 @@ CommandLine::destroyRepository(const CommandArgs &args)
         .openRepository(repositoryId)
         .destroyRepository()
     ;
-}
-
-void
-CommandLine::showOwner(const CommandArgs &args) const
-{
-    // TODO: improve this
-    if (args.size() == 1) {
-        throwError("Invalid number of arguments");
-    }
-
-    for (auto &config : OwnerConfigs) {
-        printParameter(config.second, mCore.getEnvironment<Buffer>(config.first));
-    }
+    */
 }
 
 bool
-CommandLine::parseCommand(program_options::variables_map &vm)
+CommandLine::parseCommand(const Command &command, const CommandArgs &args)
 {
-    auto args = vm["command"].as<CommandArgs>();
-
-    ParserMethod parserMethod;
+    CommandParserMethod commandParserMethod;
 
     try {
-        parserMethod = mParserMethods.at(args[0]);
+
+        commandParserMethod = mCommandParserMethods.at(command);
 
     } catch (std::out_of_range &e) {
 
-        std::cerr << boost::format("Unknown command '%1%'\n\n") % args[0];
+        std::cerr << boost::format("Unknown command '%1%'\n\n") % command;
         return false;
     }
 
-    parserMethod(*this, args);
+    commandParserMethod(*this, args);
 
     return true;
+}
+
+program_options::variables_map
+CommandLine::parseCommandArguments
+(
+    const CommandArgs &args,
+    const program_options::options_description &options,
+    const program_options::positional_options_description &positional
+)
+{
+    namespace po = boost::program_options;
+
+    po::variables_map vm;
+
+    try {
+
+        auto parsed_options = po::command_line_parser(args)
+            .options(options)
+            .positional(positional)
+            .run()
+        ;
+
+        po::store(parsed_options, vm);
+        po::notify(vm);
+
+    } catch (po::error &e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return vm;
 }
 
 void
