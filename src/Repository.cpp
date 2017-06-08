@@ -504,7 +504,7 @@ Repository::open()
 }
 
 Repository &
-Repository::eachLogs(const std::string &range, std::function<void (const Buffer &id, const Commit &)> callback)
+Repository::eachCommits(const std::string &range, std::function<void (const Buffer &id, const Commit &)> callback)
 {
     // FIXME: improve this shit
 
@@ -517,7 +517,10 @@ Repository::eachLogs(const std::string &range, std::function<void (const Buffer 
     git_revwalk_new(&walker, mGitRepository.get());
     git_revwalk_sorting(walker, GIT_SORT_TIME);
 
-    error = git_revwalk_push_range(walker, range.c_str());
+    // TODO: add support for revision range
+    //error = git_revwalk_push_range(walker, range.c_str());
+
+    error = git_revwalk_push_glob(walker, "*");
 
     if (error < 0) {
         throwGitException();

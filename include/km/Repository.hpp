@@ -143,7 +143,7 @@ public:
     /*!
      * FIXME.
      */
-    Repository &eachLogs(const std::string &range, std::function<void (const Buffer &, const Commit &)> callback);
+    Repository &eachCommits(const std::string &range, std::function<void (const Buffer &, const Commit &)> callback);
 
     /*!
      * Destroys the repository.

@@ -319,10 +319,10 @@ Core::fetchRepository()
 Core &
 Core::eachRepositoryLogs(const std::string &range, std::function<void (const Buffer &id, const Commit &)> callback)
 {
-    mRepository->eachLogs(range, [this, &callback](const Buffer &id, const Commit &input) {
+    mRepository->eachCommits(range, [this, &callback](const Buffer &id, const Commit &input) {
 
         auto textNode = mEncrypter->decrypt<TextNode>(
-            TextNode::fromBuffer(input.getSummary())
+                TextNode::fromBuffer(input.getSummary())
         );
 
         Commit ouput = input;

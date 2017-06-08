@@ -363,42 +363,100 @@ CommandLine::runShare(const CommandArgs &args)
 void
 CommandLine::runCommit(const CommandArgs &args)
 {
-    /*
-    // TODO: improve this
-    if (args.size() != 3) {
-        throwError("Invalid number of arguments");
-    }
+    namespace po = boost::program_options;
 
-    auto repositoryId = mInterpreter.parseRepository(args[1]);
-    auto message      = Buffer::fromString(args[2]);
-
-    authenticate();
-
-    mCore
-        .openRepository(repositoryId)
-        .commitRepository(message)
+    // Usage description
+    po::options_description usage("Usage: km commit [OPTIONS] <REPOSITORY> <COMMIT_MESSAGE>");
+    usage.add_options()
+        ("help,h", "Show this help message")
     ;
-    */
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("repository_id", po::value<std::string>(), "The repository ID" )
+        ("message",       po::value<std::string>(), "The commit message")
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("repository_id", 1)
+        .add("message",       1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cerr << usage;
+
+    } else if (vm.count("repository_id") && vm.count("message")) {
+
+        auto repositoryId = mInterpreter.parseRepository(vm["repository_id"].as<std::string>());
+        auto message      = Buffer::fromString(vm["message"].as<std::string>());
+
+        authenticate();
+
+        mCore
+            .openRepository(repositoryId)
+            .commitRepository(message)
+        ;
+    }
 }
 
 void
 CommandLine::runPush(const CommandArgs &args)
 {
-    /*
-    // TODO: improve this
-    if (args.size() != 2) {
-        throwError("Invalid number of arguments");
-    }
+    namespace po = boost::program_options;
 
-    auto repositoryId = mInterpreter.parseRepository(args[1]);
-
-    authenticate();
-
-    mCore
-        .openRepository(repositoryId)
-        .pushRepository()
+    // Usage description
+    po::options_description usage("Usage: km push [OPTIONS] <REPOSITORY>");
+    usage.add_options()
+        ("help,h", "Show this help message")
     ;
-    */
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("repository_id", po::value<std::string>(), "The repository ID")
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("repository_id", 1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cerr << usage;
+
+    } else if (vm.count("repository_id")) {
+
+        auto repositoryId = mInterpreter.parseRepository(vm["repository_id"].as<std::string>());
+
+        authenticate();
+
+        mCore
+            .openRepository(repositoryId)
+            .pushRepository()
+        ;
+    }
 }
 
 void
@@ -424,24 +482,54 @@ CommandLine::runFetch(const CommandArgs &args)
 void
 CommandLine::runLog(const CommandArgs &args)
 {
-    /*
-    // TODO: improve this
-    if (args.size() != 3) {
-        throwError("Invalid number of arguments");
-    }
+    namespace po = boost::program_options;
 
-    auto repositoryId  = mInterpreter.parseRepository(args[1]);
-    auto revisionRange = args[2];
-
-    authenticate();
-
-    mCore
-        .openRepository(repositoryId)
-        .eachRepositoryLogs(revisionRange, [this](const Buffer &id, const Commit &commit) {
-            printCommit(commit);
-        })
+    // Usage description
+    po::options_description usage("Usage: km commit [OPTIONS] <REPOSITORY> [REVISION_RANGE]");
+    usage.add_options()
+        ("help,h", "Show this help message")
     ;
-    */
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("repository_id",  po::value<std::string>(),                    "The repository ID" )
+        ("revision_range", po::value<std::string>()->default_value(""), "The revision range")
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("repository_id",  1)
+        .add("revision_range", 1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cerr << usage;
+
+    } else if (vm.count("repository_id")) {
+
+        auto repositoryId  = mInterpreter.parseRepository(vm["repository_id"].as<std::string>());
+        auto revisionRange = vm["revision_range"].as<std::string>();
+
+        authenticate();
+
+        mCore
+            .openRepository(repositoryId)
+            .eachRepositoryLogs(revisionRange, [this](const Buffer &id, const Commit &commit) {
+                printCommit(commit);
+            })
+        ;
+    }
 }
 
 void
