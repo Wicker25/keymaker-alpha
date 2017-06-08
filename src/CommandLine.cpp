@@ -535,21 +535,49 @@ CommandLine::runLog(const CommandArgs &args)
 void
 CommandLine::runDestroy(const CommandArgs &args)
 {
-    /*
-    // TODO: improve this
-    if (args.size() != 2) {
-        throwError("Invalid number of arguments");
-    }
+    namespace po = boost::program_options;
 
-    auto repositoryId = mInterpreter.parseRepository(args[1]);
-
-    authenticate();
-
-    mCore
-        .openRepository(repositoryId)
-        .destroyRepository()
+    // Usage description
+    po::options_description usage("Usage: km destroy [OPTIONS] <REPOSITORY>");
+    usage.add_options()
+        ("help,h", "Show this help message")
     ;
-    */
+
+    // Positional arguments
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("repository_id", po::value<std::string>(), "The repository ID" )
+    ;
+
+    po::positional_options_description positional;
+    positional
+        .add("repository_id", 1)
+    ;
+
+    // All arguments
+    po::options_description options("Allowed options");
+    options
+        .add(hidden)
+        .add(usage)
+    ;
+
+    // Execute the command
+    po::variables_map vm = parseCommandArguments(args, options, positional);
+
+    if (vm.count("help")) {
+        std::cerr << usage;
+
+    } else if (vm.count("repository_id")) {
+
+        auto repositoryId  = mInterpreter.parseRepository(vm["repository_id"].as<std::string>());
+
+        authenticate();
+
+        mCore
+            .openRepository(repositoryId)
+            .destroyRepository()
+        ;
+    }
 }
 
 bool
