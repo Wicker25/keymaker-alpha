@@ -32,7 +32,11 @@ Interpreter::parseRule(Iterator first, Iterator last, Attribute &attribute, Rule
     ;
 
     try {
-        x3::phrase_parse(first, last, parser, x3::space, attribute);
+        auto result = x3::phrase_parse(first, last, parser, x3::space, attribute);
+
+        if (!result) {
+            throw SyntaxException(error_output.str());
+        }
 
     } catch (ql::grammar::parser_exception &e) {
         throw SyntaxException(error_output.str());
